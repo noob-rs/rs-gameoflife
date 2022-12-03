@@ -1,11 +1,13 @@
 use std::{cell::RefCell, fmt::Debug, rc::Rc};
 
 use itertools::Itertools;
+use nannou::geom::Rect;
 
 pub struct GolCell {
     pub index: (u32, u32),
     neighbors: Vec<Rc<RefCell<GolCell>>>,
     pub alive: bool,
+    pub drawrect: Rect,
 }
 
 impl GolCell {
@@ -14,6 +16,7 @@ impl GolCell {
             index: (x, y),
             neighbors: vec![],
             alive: false,
+            drawrect: Rect::from_x_y_w_h(0.0, 0.0, 0.0, 0.0),
         }
     }
 
@@ -54,8 +57,8 @@ impl Game {
                 game.cells.push(Rc::new(RefCell::new(GolCell::new(x, y))));
             }
         }
-        // println!("cells: {:#?}", game.cells);
         game.populate_neighbors();
+        // println!("cells: {:#?}", game.cells);
         game
     }
 
@@ -66,16 +69,12 @@ impl Game {
                 if (dx, dy) == (0, 0) {
                     continue;
                 }
-                if let Some(s) = self.cell_at_index(cindex.0 as i32 + dx, cindex.1 as i32 + dy) {
-                    assert!(
-                        cindex.0 as i32 + dx == s.borrow().index.0 as i32
-                            && cindex.1 as i32 + dy == s.borrow().index.1 as i32,
-                        "c: {:?}, dxy: ({:?}, {:?}), s: {:?}",
-                        cindex,
-                        dx,
-                        dy,
-                        s.borrow().index
-                    );
+                if let Some(s) = self.cell_at_index(
+                    (self.cells_counts.0 as i32 + cindex.0 as i32 + dx)
+                        % self.cells_counts.0 as i32,
+                    (self.cells_counts.1 as i32 + cindex.1 as i32 + dy)
+                        % self.cells_counts.1 as i32,
+                ) {
                     c.borrow_mut().neighbors.push(s);
                 }
             }
