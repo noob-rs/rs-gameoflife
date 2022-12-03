@@ -41,28 +41,24 @@ fn model(app: &App) -> Model {
 fn update(app: &App, model: &mut Model, _update: Update) {
     let current_time = app.duration.since_start.as_secs_f32();
 
-    if app.keys.down.len() > 0 {
-        if current_time - model.last_update_keys > 0.05 {
-            model.last_update_keys = current_time;
-            if app.keys.down.contains(&Key::Plus) {
-                model.iteration_cycle /= 1.1;
-            } else if app.keys.down.contains(&Key::Minus) {
-                model.iteration_cycle *= 1.1;
-            }
-            if app.keys.down.contains(&Key::Space) {
-                model.running = !model.running;
-            }
+    if app.keys.down.len() > 0 && current_time - model.last_update_keys > 0.05 {
+        model.last_update_keys = current_time;
+        if app.keys.down.contains(&Key::Plus) {
+            model.iteration_cycle /= 1.1;
+        } else if app.keys.down.contains(&Key::Minus) {
+            model.iteration_cycle *= 1.1;
+        }
+        if app.keys.down.contains(&Key::Space) {
+            model.running = !model.running;
         }
     }
 
-    if app.mouse.buttons.left().is_down() {
-        if current_time - model.last_update_mouse > 0.5 {
-            model.last_update_mouse = current_time;
-            for cell in model.game.cells.iter() {
-                let mut cell = cell.borrow_mut();
-                if cell.drawrect.contains(app.mouse.position()) {
-                    cell.alive = !cell.alive;
-                }
+    if app.mouse.buttons.left().is_down() && current_time - model.last_update_mouse > 0.5 {
+        model.last_update_mouse = current_time;
+        for cell in model.game.cells.iter() {
+            let mut cell = cell.borrow_mut();
+            if cell.drawrect.contains(app.mouse.position()) {
+                cell.alive = !cell.alive;
             }
         }
     }

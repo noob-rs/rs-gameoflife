@@ -65,7 +65,7 @@ impl Game {
     fn populate_neighbors(&mut self) {
         for c in self.cells.iter() {
             let cindex = c.borrow().index;
-            for (dx, dy) in (-1 as i32..=1).cartesian_product(-1 as i32..=1) {
+            for (dx, dy) in (-1_i32..=1).cartesian_product(-1_i32..=1) {
                 if (dx, dy) == (0, 0) {
                     continue;
                 }
@@ -88,13 +88,10 @@ impl Game {
             || index_y >= self.cells_counts.1 as i32
         {
             None
-        } else if let Some(c) = self
-            .cells
-            .get((self.cells_counts.0 * index_y as u32 + index_x as u32) as usize)
-        {
-            Some(c.clone())
         } else {
-            None
+            self.cells
+                .get((self.cells_counts.0 * index_y as u32 + index_x as u32) as usize)
+                .cloned()
         }
     }
 
